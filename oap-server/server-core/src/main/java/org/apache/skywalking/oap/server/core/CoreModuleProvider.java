@@ -38,6 +38,7 @@ import org.apache.skywalking.oap.server.core.cache.NetworkAddressAliasCache;
 import org.apache.skywalking.oap.server.core.cache.ProfileTaskCache;
 import org.apache.skywalking.oap.server.core.cluster.ClusterModule;
 import org.apache.skywalking.oap.server.core.cluster.ClusterRegister;
+import org.apache.skywalking.oap.server.core.cluster.OAPNodeChecker;
 import org.apache.skywalking.oap.server.core.cluster.RemoteInstance;
 import org.apache.skywalking.oap.server.core.command.CommandService;
 import org.apache.skywalking.oap.server.core.config.ComponentLibraryCatalogService;
@@ -54,6 +55,7 @@ import org.apache.skywalking.oap.server.core.profile.ProfileTaskMutationService;
 import org.apache.skywalking.oap.server.core.query.AggregationQueryService;
 import org.apache.skywalking.oap.server.core.query.AlarmQueryService;
 import org.apache.skywalking.oap.server.core.query.BrowserLogQueryService;
+import org.apache.skywalking.oap.server.core.query.EventQueryService;
 import org.apache.skywalking.oap.server.core.query.LogQueryService;
 import org.apache.skywalking.oap.server.core.query.MetadataQueryService;
 import org.apache.skywalking.oap.server.core.query.MetricsMetadataQueryService;
@@ -250,6 +252,7 @@ public class CoreModuleProvider extends ModuleProvider {
         this.registerServiceImplementation(AggregationQueryService.class, new AggregationQueryService(getManager()));
         this.registerServiceImplementation(AlarmQueryService.class, new AlarmQueryService(getManager()));
         this.registerServiceImplementation(TopNRecordsQueryService.class, new TopNRecordsQueryService(getManager()));
+        this.registerServiceImplementation(EventQueryService.class, new EventQueryService(getManager()));
 
         // add profile service implementations
         this.registerServiceImplementation(
@@ -312,6 +315,8 @@ public class CoreModuleProvider extends ModuleProvider {
                 .getService(ClusterRegister.class)
                 .registerRemote(gRPCServerInstance);
         }
+
+        OAPNodeChecker.setROLE(CoreModuleConfig.Role.fromName(moduleConfig.getRole()));
 
         DynamicConfigurationService dynamicConfigurationService = getManager().find(ConfigurationModule.NAME)
                                                                               .provider()
